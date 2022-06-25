@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve",
-    "build": "webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon server/index.js",
+    "start": "webpack server --mode=development --open",
+    "dev": "concurrently \"npm run start\" \"npm run server\"",
+    "build": "webpack --mode=production",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,12 @@
   },
   "homepage": "https://github.com/jacksonktong/tthoarder#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "cookieparser": "^0.1.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.18",
+    "pg": "^8.7.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
