@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/jacksonktong/tthoarder#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
     "cookieparser": "^0.1.0",
     "dotenv": "^16.0.1",
