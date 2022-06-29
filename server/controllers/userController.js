@@ -16,7 +16,7 @@ user.searchInput = async (req, res, next) => {
   return next()
 };
 
-user.saveToCollection = async (req, res, next) => {
+user.saveToCatalog = async (req, res, next) => {
   const { game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url } = req.body;
   const { username } = req.cookies;
   const queryString = 
@@ -27,17 +27,22 @@ user.saveToCollection = async (req, res, next) => {
   `INSERT INTO collection (user_id, game_id) 
    VALUES ($1, $2)
   `
+  const wishlistQueryString = 
+  `INSERT INTO wishlist (user_id, game_id) 
+   VALUES ($1, $2)
+  `
   try{
-  const catalog = await pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
-  //gets userid from users
-  const userid = await getUserId(username)
-  //need to get game details from tt_games, then we save into collection
-  const gameid = await getGameId(game_id)
+    //gets userid from users
+    const userid = await getUserId(username)
+    //need to get game details from tt_games, then we save into collection
+    const gameid = await getGameId(game_id)
+    pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
 
-  const collection = await pool.query(collectQueryString, [userid, gameid])
+    if(req.body.collection) pool.query(collectQueryString, [userid, gameid]);
+    if(req.body.wishlist) pool.query(wishlistQueryString, [userid, gameid]);
 
+    return next();
 
-  return next();
   } catch(err) {
     console.error("Error:", err)
   }
