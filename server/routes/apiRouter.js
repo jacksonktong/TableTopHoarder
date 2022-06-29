@@ -22,4 +22,8 @@ router.get('/search', userController.searchInput, (req, res)=> {
   return res.status(200).send(res.locals.searchResult)
 })
 
+router.post('/collection', userController.saveToCollection, (req, res) => {
+  return res.status(200).send('success')
+});
+
 module.exports = router;
