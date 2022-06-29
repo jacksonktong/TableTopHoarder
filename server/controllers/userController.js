@@ -23,20 +23,18 @@ user.saveToCollection = async (req, res, next) => {
   `INSERT INTO tt_games (game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url)
    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `
-  const ownedQueryString = 
-  `INSERT INTO ownedgames (user_id, game_id) 
+  const collectQueryString = 
+  `INSERT INTO collection (user_id, game_id) 
    VALUES ($1, $2)
   `
   try{
-  const collection = await pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
-  // const ownedGames = await pool.query(ownedQueryString, [user_id, game_id])
-  //Get user id from users, get prim key from ttgames then save into collection
-
+  const catalog = await pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
   //gets userid from users
   const userid = await getUserId(username)
-
   //need to get game details from tt_games, then we save into collection
+  const gameid = await getGameId(game_id)
 
+  const collection = await pool.query(collectQueryString, [userid, gameid])
 
 
   return next();
@@ -57,7 +55,18 @@ user.saveToCollection = async (req, res, next) => {
     }
   }
 
-  
+  async function getGameId(gameId) {
+    const queryString = 
+    `SELECT id FROM tt_games
+     WHERE game_id = $1
+    `
+    try{
+      const record = await pool.query(queryString, [gameId])
+      return record.rows[0].id
+    } catch(err) {
+      console.error('Error in retrieving game id')
+    }
+  }
 
 };
 
