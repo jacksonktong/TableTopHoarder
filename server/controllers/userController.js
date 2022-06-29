@@ -10,7 +10,6 @@ user.searchInput = async (req, res, next) => {
   const {value} = req.body;
   const searchUrl = `https://api.boardgameatlas.com/api/search?name=${value}&client_id=${api_id}`;
   const result = await searchApi(searchUrl);
-  console.log(result)
   res.locals.searchResult = result;
   
   return next()
@@ -36,6 +35,7 @@ user.saveToCatalog = async (req, res, next) => {
     const userid = await getUserId(username)
     //need to get game details from tt_games, then we save into collection
     const gameid = await getGameId(game_id)
+    console.log(gameid)
     pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
 
     if(req.body.collection) pool.query(collectQueryString, [userid, gameid]);
@@ -46,34 +46,60 @@ user.saveToCatalog = async (req, res, next) => {
   } catch(err) {
     console.error("Error:", err)
   }
-
-  async function getUserId(username) {
-    const queryString = 
-    `SELECT user_id FROM users
-     WHERE username = $1
-    `
-    try{
-    const record = await pool.query(queryString, [username])
-    return record.rows[0].user_id;
-    } catch(err) {
-      console.error('Error in retrieving user id:', err)
-    }
-  }
-
-  async function getGameId(gameId) {
-    const queryString = 
-    `SELECT id FROM tt_games
-     WHERE game_id = $1
-    `
-    try{
-      const record = await pool.query(queryString, [gameId])
-      return record.rows[0].id
-    } catch(err) {
-      console.error('Error in retrieving game id')
-    }
-  }
-
 };
+
+async function getUserId(username) {
+  const queryString = 
+  `SELECT user_id FROM users
+   WHERE username = $1
+  `
+  try{
+  const record = await pool.query(queryString, [username])
+  return record.rows[0].user_id;
+  } catch(err) {
+    console.error('Error in retrieving user id:', err)
+  }
+}
+
+async function getGameId(gameId) {
+  const queryString = 
+  `SELECT id FROM tt_games
+   WHERE game_id = $1
+  `
+  try{
+    const record = await pool.query(queryString, [gameId])
+    return record.rows[0].id
+  } catch(err) {
+    console.error('Error in retrieving game id')
+  }
+}
+
+user.savedGames = async (req, res, next) => {
+  //get user id 
+  //select all from collections where userid
+  //inner join game ids and tt_games
+  const { username } = req.cookies;
+  const queryString = 
+  `SELECT *
+   FROM collection
+   INNER JOIN tt_games
+   ON collection.game_id = tt_games.id
+   WHERE collection.user_id = $1
+  `
+
+  try {
+    const userid = await getUserId(username);
+
+    const records = await pool.query(queryString, [userid])
+
+    res.locals.collection = records.rows
+    return next();
+
+  } catch(err) {
+    console.error('Error in retrieving favorites:', err)
+    }
+};
+
 
 async function searchApi(url) {
  const output = [];
