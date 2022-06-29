@@ -41,7 +41,7 @@ auth.userLogin = async (req, res, next) => {
       if(!auth) return res.json({message: 'Invalid information'});
       res.locals.username = user.username;
       res.locals.authenticated = auth;
-      res.cookie('id', username, {httpOnly: true});
+      res.cookie('username', username, {httpOnly: true});
       return next();
     }
   } catch(e){
