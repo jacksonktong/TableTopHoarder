@@ -167,6 +167,31 @@ user.deleteFromWishlist = async (req, res, next) => {
   }
 };
 
+user.addRating = async (req, res, next) => {
+  const { username } = req.cookies;
+  const { id, rating } = req.body;
+  const queryString = 
+  `UPDATE collection
+  SET rating = $1
+  WHERE user_id = $2 
+  AND game_id = $3
+  `
+
+  try {
+    const userid = await getUserId(username);
+
+    pool.query(queryString, [rating, userid, id])
+      .then(()=> next())
+      .catch((err)=> {
+        console.error('Error in rating query:', err)
+      })
+  }
+  catch(err) {
+    console.error('Error in adding rating:', err)
+  }
+
+};
+
 async function getGameDetails(gameid) {
   const searchUrl = `https://api.boardgameatlas.com/api/search?ids=${gameid}&client_id=${api_id}`;
   const gameInfo = await hp.getGameInfo(searchUrl);
