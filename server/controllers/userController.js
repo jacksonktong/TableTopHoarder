@@ -3,6 +3,7 @@ const { query } = require('express');
 const pool = require("../models/usersModel.js");
 require('dotenv').config();
 const api_id = process.env.BGA_ID;
+const hp = require('./homePageController.js');
 
 const user = {};
 
@@ -100,6 +101,49 @@ user.savedGames = async (req, res, next) => {
     }
 };
 
+user.wishlist = async (req, res, next) => {
+  //get game ids, make api calls for game ids, push into array, send to fe
+  const { username } = req.cookies;
+  const output = [];
+  try {
+    const gameIdArray = await getAllGameIds(username);
+    for(const gameid of gameIdArray) {
+      const game = await getGameDetails(gameid.game_id);
+      console.log('gamedetails', game)
+      output.push(game)
+    }
+
+    res.locals.wishlist = output;
+    return next();
+  }
+  catch(err) {
+    console.error('Error in wishlist:', err)
+  }
+};
+
+async function getGameDetails(gameid) {
+  const searchUrl = `https://api.boardgameatlas.com/api/search?ids=${gameid}&client_id=${api_id}`;
+  const gameInfo = await hp.getGameInfo(searchUrl);
+  return gameInfo
+}
+
+async function getAllGameIds(username) {
+  const getGameIdQuery = 
+  `SELECT tt_games.game_id
+  FROM wishlist
+  INNER JOIN tt_games
+  ON wishlist.game_id = tt_games.id
+  WHERE wishlist.user_id = $1
+ `
+ try {
+  const userid = await getUserId(username);
+  const records = await pool.query(getGameIdQuery, [userid]);
+
+  return records.rows
+ } catch (err) {
+    console.error('Error in retrieving game ids:', err)
+ }
+}
 
 async function searchApi(url) {
  const output = [];
