@@ -6,7 +6,7 @@ const gotmUrl = `https://api.boardgameatlas.com/api/search?ids=RLlDWHh7hR&pretty
 
 const homePage = {};
 
-async function getGotm(url){
+async function getGameInfo(url){
   try {
   const response = await axios.get(url);
   const game = response.data.games[0]
@@ -26,12 +26,12 @@ async function getGotm(url){
     return gameInfo;
   }
   catch(err){
-    console.error('Error in getting gotm:', err)
+    console.error('Error in getting game info:', err)
   }
 }
 
 homePage.gameOfTheMonth = async (req, res, next) => {
-  const gameDetails = await getGotm(gotmUrl);
+  const gameDetails = await getGameInfo(gotmUrl);
 
   res.locals.gotm = gameDetails;
 
@@ -39,4 +39,7 @@ homePage.gameOfTheMonth = async (req, res, next) => {
 
 };
 
-module.exports = homePage;
+module.exports = {
+  homePage,
+  getGameInfo
+};
