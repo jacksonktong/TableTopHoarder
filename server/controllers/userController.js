@@ -109,7 +109,6 @@ user.wishlist = async (req, res, next) => {
     const gameIdArray = await getAllGameIds(username);
     for(const gameid of gameIdArray) {
       const game = await getGameDetails(gameid.game_id);
-      console.log('gamedetails', game)
       output.push(game)
     }
 
@@ -118,6 +117,29 @@ user.wishlist = async (req, res, next) => {
   }
   catch(err) {
     console.error('Error in wishlist:', err)
+  }
+};
+
+user.deleteFromCollection = async (req, res, next) => {
+  const { username } = req.cookies;
+  const { id } = req.body;
+  //fe sends game_id & prim id
+  const queryString = 
+  `DELETE FROM collection 
+   WHERE user_id = $1
+   AND game_id = $2
+  `
+
+  try {
+    const userid = await getUserId(username);
+    pool.query(queryString, [userid, id])
+      .then(()=> next())
+      .catch((err)=> {
+        console.error('Error in delete query string:', err)
+      })
+  }
+  catch(err) {
+    console.error('Error in removing game:', err)
   }
 };
 
