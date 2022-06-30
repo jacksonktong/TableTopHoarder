@@ -34,4 +34,18 @@ router.get('/wishlist', userController.wishlist, (req, res) => {
   return res.status(200).send(res.locals.wishlist)
 });
 
+router.delete('/collection', userController.deleteFromCollection, (req, res) => {
+  return res.status(200).send('success')
+});
+
+router.delete('/wishlist', userController.deleteFromWishlist, (req, res) => {
+  return res.status(200).send('success')
+});
+
+router.patch('/collection', userController.addRating, (req, res) => {
+  return res.status(200).send('success')
+});
+
+
+
 module.exports = router;
