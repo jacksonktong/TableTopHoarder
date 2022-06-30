@@ -14,7 +14,7 @@ router.post('/login', authController.userLogin, (req, res) => {
   return res.status(200).send('success')
 });
 
-router.get('/home', homePageController.gameOfTheMonth, (req, res) => {
+router.get('/home', homePageController.homePage.gameOfTheMonth, (req, res) => {
   return res.status(200).send(res.locals.gotm)
 });
 
@@ -22,8 +22,16 @@ router.get('/search', userController.searchInput, (req, res)=> {
   return res.status(200).send(res.locals.searchResult)
 })
 
-router.post('/collection', userController.saveToCollection, (req, res) => {
+router.post('/catalog', userController.saveToCatalog, (req, res) => {
   return res.status(200).send('success')
+});
+
+router.get('/collection', userController.savedGames, (req, res) => {
+  return res.status(200).send(res.locals.collection)
+});
+
+router.get('/wishlist', userController.wishlist, (req, res) => {
+  return res.status(200).send(res.locals.wishlist)
 });
 
 module.exports = router;
