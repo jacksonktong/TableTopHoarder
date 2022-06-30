@@ -143,6 +143,30 @@ user.deleteFromCollection = async (req, res, next) => {
   }
 };
 
+user.deleteFromWishlist = async (req, res, next) => {
+  const { username } = req.cookies;
+  const { id } = req.body;
+  //fe sends game_id & prim id
+  const queryString = 
+  `DELETE FROM wishlist 
+   WHERE user_id = $1
+   AND game_id = $2
+  `
+
+  try {
+    const userid = await getUserId(username);
+    const gameid = await getGameId(id)
+    pool.query(queryString, [userid, gameid])
+      .then(()=> next())
+      .catch((err)=> {
+        console.error('Error in delete wishlist query string:', err)
+      })
+  }
+  catch(err) {
+    console.error('Error in removing game:', err)
+  }
+};
+
 async function getGameDetails(gameid) {
   const searchUrl = `https://api.boardgameatlas.com/api/search?ids=${gameid}&client_id=${api_id}`;
   const gameInfo = await hp.getGameInfo(searchUrl);
