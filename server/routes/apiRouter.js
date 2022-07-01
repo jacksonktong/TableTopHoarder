@@ -11,7 +11,7 @@ router.post('/signup', authController.createUser, (req, res) => {
 });
 
 router.post('/login', authController.userLogin, (req, res) => {
-  return res.status(200).send('success')
+  return res.status(200).send(res.locals.authenticated)
 });
 
 router.get('/home', homePageController.homePage.gameOfTheMonth, (req, res) => {
