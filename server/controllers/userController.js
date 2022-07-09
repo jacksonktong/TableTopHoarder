@@ -31,16 +31,16 @@ user.saveToCatalog = async (req, res, next) => {
   `INSERT INTO wishlist (user_id, game_id) 
    VALUES ($1, $2)
   `
+  console.log(req.body)
   try{
     //gets userid from users
     const userid = await getUserId(username)
     //need to get game details from tt_games, then we save into collection
-    const gameid = await getGameId(game_id)
-    console.log(gameid)
+    // const gameid = await getGameId(game_id)
     pool.query(queryString, [game_id, name, year_published, min_players, max_players, min_length, max_length, description_preview, image_url, thumb_url, url])
-
-    if(req.body.collection) pool.query(collectQueryString, [userid, gameid]);
-    if(req.body.wishlist) pool.query(wishlistQueryString, [userid, gameid]);
+    console.log(req.body)
+    if(req.body.collection) pool.query(collectQueryString, [userid, game_id]);
+    if(req.body.wishlist) pool.query(wishlistQueryString, [userid, game_id]);
 
     return next();
 

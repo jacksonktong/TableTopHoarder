@@ -12,7 +12,6 @@ export default function FeaturedGame() {
     fetch('/api/home')
       .then((res)=> res.json())
       .then((data)=> {
-        console.log('gotm data', data)
         setFeaturedGame(data)
       })
       .catch((err)=> console.error('Error in getting gotm:', err))
